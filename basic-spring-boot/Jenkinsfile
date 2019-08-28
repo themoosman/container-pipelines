@@ -16,6 +16,7 @@ openshift.withCluster() {
   env.STAGE = "${APP_NAME}-stage"
   env.PROD = "${APP_NAME}-prod"
   env.MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY = "${env.NEXUS_REPO}"
+  env.SONAR_URL = "${env.SONAR_SERVER_URL}"
   echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}" 
 }
 
@@ -71,6 +72,7 @@ pipeline {
       steps {
         echo "Running sonarqube scan..."
         // sonarqubeStaticAnalysis(pomFile: "${POM_FILE}", buildServerWebHookName: "jenkins"}
+        sh "mvn -B sonar:sonar -Dsonar.host.url=${env.SONAR_URL}"
       }
     }
 
