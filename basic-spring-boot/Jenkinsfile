@@ -58,13 +58,20 @@ pipeline {
       }
     }
 
-    // Run Maven unit tests
+    // Publish Results to Nexus
     stage('Push to Nexus'){
       steps {
-        echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}"
+        echo "Using Nexus Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}"
+        sh "mvn -B deploy -DskipTests=true -Dmaven.install.skip=true -DaltDeploymentRepository=${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY} -f ${POM_FILE}"
       }
     }
 
+    // Run code quality scan
+    stage('Run Code Analysis'){
+      steps {
+        echo "Running sonarqube scan..."
+        // sonarqubeStaticAnalysis(pomFile: "${POM_FILE}", buildServerWebHookName: "jenkins"}
+    }
 
     // Build Container Image using the artifacts produced in previous stages
     stage('Build Container Image'){
