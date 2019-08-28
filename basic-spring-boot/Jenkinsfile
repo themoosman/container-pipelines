@@ -15,6 +15,8 @@ openshift.withCluster() {
   env.DEV = "${APP_NAME}-dev"
   env.STAGE = "${APP_NAME}-stage"
   env.PROD = "${APP_NAME}-prod"
+  env.MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY = env.MVN_REPO
+  echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}" 
 }
 
 pipeline {
@@ -59,7 +61,7 @@ pipeline {
     // Run Maven unit tests
     stage('Push to Nexus'){
       steps {
-        sh "echo 'foo bar'"
+        echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}"
       }
     }
 
@@ -96,6 +98,14 @@ pipeline {
       }
     }
 
+    stage('Stage Promotion Gate') {
+      steps {
+        script {
+          input message: 'Promote application to Stage?'
+        }
+      }
+    }
+    
     stage('Promote from Dev to Stage') {
       steps {
         tagImage(sourceImageName: env.APP_NAME, sourceImagePath: env.DEV, toImagePath: env.STAGE)
@@ -108,7 +118,7 @@ pipeline {
       }
     }
 
-    stage('Promotion gate') {
+    stage('Production Promotion Gate') {
       steps {
         script {
           input message: 'Promote application to Production?'
