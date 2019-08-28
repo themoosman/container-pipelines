@@ -71,6 +71,7 @@ pipeline {
       steps {
         echo "Running sonarqube scan..."
         // sonarqubeStaticAnalysis(pomFile: "${POM_FILE}", buildServerWebHookName: "jenkins"}
+      }
     }
 
     // Build Container Image using the artifacts produced in previous stages
