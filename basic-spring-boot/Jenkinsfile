@@ -62,7 +62,7 @@ pipeline {
     stage('Push to Nexus'){
       steps {
         echo "Using Nexus Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}"
-        sh "mvn -B deploy -DskipTests=true -Dmaven.install.skip=true -Ddependency-check.skip=true -DaltDeploymentRepository=${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY} -f ${POM_FILE}"
+        sh "mvn -B deploy -DskipTests=true -Dmaven.install.skip=true -Ddependency-check.skip=true -DaltDeploymentRepository=${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY} -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true -f ${POM_FILE}"
       }
     }
 
