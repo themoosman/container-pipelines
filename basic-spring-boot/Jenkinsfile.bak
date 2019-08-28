@@ -56,14 +56,6 @@ pipeline {
       }
     }
 
-    // Run Maven unit tests
-    stage('Push to Nexus'){
-      steps {
-        sh "echo 'foo bar'"
-      }
-    }
-
-
     // Build Container Image using the artifacts produced in previous stages
     stage('Build Container Image'){
       steps {
