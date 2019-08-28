@@ -45,6 +45,8 @@ objects:
           value: "${APPLICATION_SOURCE_REPO}"
         - name: "APPLICATION_SOURCE_REF"
           value: "${APPLICATION_SOURCE_REF}"
+        - name: "NEXUS_REPO"
+          value: "${NEXUS_REPO}"
 - apiVersion: v1
   kind: BuildConfig
   metadata:
@@ -116,3 +118,7 @@ parameters:
   name: IMAGE_STREAM_TAG_NAME
   required: true
   value: redhat-openjdk18-openshift:1.1
+- description: Location of the Nexus repository.
+  name: NEXUS_REPO
+  required: true
+  value: https://nexus.example.com
