@@ -74,8 +74,7 @@ pipeline {
     stage('Run Code Analysis'){
       steps {
         echo "Running sonarqube scan..."
-        // sonarqubeStaticAnalysis(pomFile: "${POM_FILE}", buildServerWebHookName: "jenkins"}
-        sh "mvn -B sonar:sonar -Dsonar.host.url=${env.SONAR_URL} -Dsonar.login=${env.SONAR_LOGIN}"
+        sonarqubeStaticAnalysis(pomFile: "${POM_FILE}", buildServerWebHookName: "jenkins"}
       }
     }
 
