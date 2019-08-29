@@ -47,6 +47,10 @@ objects:
           value: "${APPLICATION_SOURCE_REF}"
         - name: "NEXUS_REPO"
           value: "${NEXUS_REPO}"
+        - name: "SONAR_SERVER_URL"
+          value: "${SONAR_SERVER_URL}"
+        - name: "SONAR_TOKEN"
+          value: "${SONAR_TOKEN}"
 - apiVersion: v1
   kind: BuildConfig
   metadata:
@@ -121,4 +125,9 @@ parameters:
 - description: Location of the Nexus repository.
   name: NEXUS_REPO
   required: true
-  value: https://nexus.example.com
+- description: Location of the Sonar Server.
+  name: SONAR_SERVER_URL
+  required: true
+- description: Token to authenticate to Sonar
+  name: SONAR_TOKEN
+  required: true
