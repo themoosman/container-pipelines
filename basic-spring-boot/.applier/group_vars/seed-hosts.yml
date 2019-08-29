@@ -11,6 +11,9 @@ sb_sa_name: "jenkins"
 sb_source_repository_url: "https://github.com/themoosman/container-pipelines.git"
 sb_source_repository_ref: master
 sb_pipeline_script: "Jenkinsfile"
+nexus_repo: ""
+sonar_server_url: ""
+sonar_token: ""
 
 openshift_cluster_content:
 - object: projects
@@ -32,6 +35,9 @@ openshift_cluster_content:
       APPLICATION_SOURCE_REPO: "{{ sb_application_repository_url }}"
       APPLICATION_SOURCE_REF: "{{ sb_application_repository_ref }}"
       PIPELINE_SCRIPT: "{{ sb_pipeline_script }}"
+      NEXUS_REPO: "{{ nexus_repo }}"
+      SONAR_SERVER_URL: "{{ sonar_server_url }}"
+      SONAR_TOKEN: "{{ sonar_token }}"
     tags:
       - build
 - object: deployments
