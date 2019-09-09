@@ -16,9 +16,9 @@ openshift.withCluster() {
   env.STAGE = "${APP_NAME}-stage"
   env.PROD = "${APP_NAME}-prod"
   env.MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY = "${env.NEXUS_REPO}"
-  echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}" 
+  echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}"
   env.SONAR_URL = "${env.SONAR_SERVER_URL}"
-  echo "Using Sonar Server: ${SONAR_URL}" 
+  echo "Using Sonar Server: ${SONAR_URL}"
   env.SONAR_LOGIN = "${env.SONAR_TOKEN}"
 }
 
@@ -57,11 +57,11 @@ pipeline {
     // Run Maven unit tests
     stage('Unit Test'){
       steps {
-        // sh "mvn -B test -f ${POM_FILE}"
-        echo "Running sonarqube scan..."
+        echo "Running unit tests..."
+        sh "mvn -B test -f ${POM_FILE}"
       }
     }
-    
+
     // Run code quality scan
     stage('Run Code Analysis'){
       steps {
@@ -69,7 +69,7 @@ pipeline {
         sh "mvn -B sonar:sonar -Dsonar.host.url=${env.SONAR_URL} -Dsonar.login=${env.SONAR_LOGIN}"
       }
     }
-    
+
     // Publish Results to Nexus
     stage('Push to Nexus'){
       steps {
@@ -110,43 +110,23 @@ pipeline {
       }
     }
 
-    stage('Stage Promotion Gate') {
+    stage('QA Promotion Gate') {
       steps {
         script {
-          input message: 'Promote application to Stage?'
+          input message: 'Promote application to QA?'
         }
       }
     }
-    
-    stage('Promote from Dev to Stage') {
+
+    stage('Promote from Dev to QA') {
       steps {
         tagImage(sourceImageName: env.APP_NAME, sourceImagePath: env.DEV, toImagePath: env.STAGE)
       }
     }
 
-    stage ('Verify Deployment to Stage') {
+    stage ('Verify Deployment to QA') {
       steps {
         verifyDeployment(projectName: env.STAGE, targetApp: env.APP_NAME)
-      }
-    }
-
-    stage('Production Promotion Gate') {
-      steps {
-        script {
-          input message: 'Promote application to Production?'
-        }
-      }
-    }
-
-    stage('Promote from Stage to Prod') {
-      steps {
-        tagImage(sourceImageName: env.APP_NAME, sourceImagePath: env.STAGE, toImagePath: env.PROD)
-      }
-    }
-
-    stage ('Verify Deployment to Prod') {
-      steps {
-        verifyDeployment(projectName: env.PROD, targetApp: env.APP_NAME)
       }
     }
   }

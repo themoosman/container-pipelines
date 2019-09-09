@@ -15,6 +15,11 @@ openshift.withCluster() {
   env.DEV = "${APP_NAME}-dev"
   env.STAGE = "${APP_NAME}-stage"
   env.PROD = "${APP_NAME}-prod"
+  env.MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY = "${env.NEXUS_REPO}"
+  echo "Using Maven Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}" 
+  env.SONAR_URL = "${env.SONAR_SERVER_URL}"
+  echo "Using Sonar Server: ${SONAR_URL}" 
+  env.SONAR_LOGIN = "${env.SONAR_TOKEN}"
 }
 
 pipeline {
@@ -52,7 +57,24 @@ pipeline {
     // Run Maven unit tests
     stage('Unit Test'){
       steps {
-        sh "mvn -B test -f ${POM_FILE}"
+        // sh "mvn -B test -f ${POM_FILE}"
+        echo "Running sonarqube scan..."
+      }
+    }
+    
+    // Run code quality scan
+    stage('Run Code Analysis'){
+      steps {
+        echo "Running sonarqube scan, using server: ${env.SONAR_URL}"
+        sh "mvn -B sonar:sonar -Dsonar.host.url=${env.SONAR_URL} -Dsonar.login=${env.SONAR_LOGIN}"
+      }
+    }
+    
+    // Publish Results to Nexus
+    stage('Push to Nexus'){
+      steps {
+        echo "Using Nexus Repo: ${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY}"
+        sh "mvn -B deploy -DskipTests=true -Dmaven.install.skip=true -Ddependency-check.skip=true -DaltDeploymentRepository=${MVN_SNAPSHOT_DEPLOYMENT_REPOSITORY} -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true -f ${POM_FILE}"
       }
     }
 
@@ -88,6 +110,14 @@ pipeline {
       }
     }
 
+    stage('Stage Promotion Gate') {
+      steps {
+        script {
+          input message: 'Promote application to Stage?'
+        }
+      }
+    }
+    
     stage('Promote from Dev to Stage') {
       steps {
         tagImage(sourceImageName: env.APP_NAME, sourceImagePath: env.DEV, toImagePath: env.STAGE)
@@ -100,7 +130,7 @@ pipeline {
       }
     }
 
-    stage('Promotion gate') {
+    stage('Production Promotion Gate') {
       steps {
         script {
           input message: 'Promote application to Production?'
