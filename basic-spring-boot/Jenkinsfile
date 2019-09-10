@@ -118,6 +118,13 @@ pipeline {
       }
     }
 
+    stage ('Tag Artifact in Nexus') {
+      steps {
+        echo "Stub"
+      }
+    }
+
+
     stage('QA Promotion Gate') {
       steps {
         script {
